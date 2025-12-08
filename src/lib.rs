@@ -24,12 +24,13 @@ async fn main() {
     };
 
     // 初始化聊天机器人
-    let chatbot = match ChatBot::new(config).await {
+    let chatbot = match ChatBot::new(config, &config_json_path).await {
         Ok(service) => {
             let stats = service.get_stats();
             kovi::log::info!("🚀 聊天机器人初始化成功");
-            kovi::log::info!("   LLM: {} ({})", stats.llm_provider, stats.llm_model);
+            kovi::log::info!("   LLM: {}", stats.llm_model);
             kovi::log::info!("   RAG: {}", if stats.rag_enabled { "已启用" } else { "未启用" });
+            kovi::log::info!("   MCP: {}", if stats.mcp_enabled { "已启用" } else { "未启用" });
             Arc::new(service)
         }
         Err(e) => {

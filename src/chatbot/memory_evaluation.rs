@@ -6,7 +6,7 @@ use anyhow::Result;
 use chrono::{DateTime, Duration, Utc};
 
 use crate::chatbot::config::MemoryEvaluationConfig;
-use crate::chatbot::llm::LlmClient;
+use crate::chatbot::llm::{LlmClient, LlmRequestParams};
 
 /// 记忆保留时长枚举
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +48,6 @@ impl RetentionDuration {
         let now = Utc::now();
         match self {
             RetentionDuration::None => Some(now), // 立即过期
-            RetentionDuration::OneDay => Some(now + Duration::days(1)),
             RetentionDuration::OneWeek => Some(now + Duration::weeks(1)),
             RetentionDuration::OneMonth => Some(now + Duration::days(30)),
             RetentionDuration::Forever => None, // 永不过期
@@ -59,7 +58,6 @@ impl RetentionDuration {
     pub fn as_str(&self) -> &'static str {
         match self {
             RetentionDuration::None => "不保存",
-            RetentionDuration::OneDay => "1天",
             RetentionDuration::OneWeek => "1周",
             RetentionDuration::OneMonth => "1个月",
             RetentionDuration::Forever => "永久",
@@ -76,11 +74,20 @@ pub struct MemoryEvaluator {
 impl MemoryEvaluator {
     /// 创建新的记忆评估器
     pub fn new(config: MemoryEvaluationConfig) -> Result<Self> {
+        // 使用配置中的 LLM 请求参数
+        let llm_params = LlmRequestParams {
+            temperature: config.temperature,
+            top_p: config.top_p,
+            max_tokens: config.max_tokens,
+            presence_penalty: config.presence_penalty,
+            frequency_penalty: config.frequency_penalty,
+        };
+        
         let llm_client = LlmClient::new(
-            "openai", // 使用OpenAI兼容API
             config.apikey.clone(),
             config.url.clone(),
             config.model.clone(),
+            llm_params,
         ).map_err(|e| anyhow::anyhow!("记忆评估器初始化失败: {}", e))?;
 
         Ok(Self {

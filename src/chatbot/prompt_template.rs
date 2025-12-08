@@ -32,16 +32,13 @@ impl PromptTemplate {
         prompt.push_str(&format!("📅 当前时间：{}\n\n", current_time));
         
         // 2. 角色性格设置
-        prompt.push_str("🎭 角色设定\n");
-        prompt.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        prompt.push_str("# 角色设定，非常重要, 请务必牢记！！！\n");
         prompt.push_str("下面扮演名为\"小诗\"的角色进行对话，你要时刻牢记自己的名字\n");
-        prompt.push_str("接下来的对话回答请用纯文本，不要包含markdown等格式，也不要包含颜文字和emoji表情等其他非文本字符。\n\n");
         prompt.push_str(character_prompt);
         prompt.push_str("\n\n");
         
         // 3. 时间理解指引
-        prompt.push_str("⏰ 时间理解指引\n");
-        prompt.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        prompt.push_str("# 时间理解指引\n");
         prompt.push_str("• 当用户提到\"今天\"、\"明天\"、\"昨天\"等时间词时，请基于当前时间理解\n");
         prompt.push_str("• 记忆中的时间戳帮助你判断信息是否过时\n");
         prompt.push_str("• 如果记忆距离现在超过1天，可以主动提及时间跨度\n");
@@ -50,8 +47,7 @@ impl PromptTemplate {
         // 4. 长期记忆（如果有）
         if let Some(memories) = memories {
             if !memories.is_empty() {
-                prompt.push_str("📚 相关记忆（长期记忆）\n");
-                prompt.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                prompt.push_str("# 相关记忆\n");
                 prompt.push_str("以下是与当前对话相关的历史记忆，按时间顺序排列：\n\n");
                 
                 let mut total_tokens = 0;
@@ -76,12 +72,18 @@ impl PromptTemplate {
         }
         
         // 5. 对话指引
-        prompt.push_str("💬 对话指引\n");
-        prompt.push_str("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        prompt.push_str("• 如果记忆中有相关信息，请自然地引用，但不要生硬地复述\n");
-        prompt.push_str("• 如果用户问到之前聊过的内容，可以回忆并回答\n");
-        prompt.push_str("• 如果记忆中的信息可能过时，请谨慎使用并适当提醒\n");
-        prompt.push_str("• 保持对话自然流畅，记忆只是辅助，不要让用户感觉到明显的\"检索\"\n");
+        prompt.push_str("# 对话指引\n");
+        prompt.push_str("* 你的名字叫\"小诗\"，你要时刻牢记自己的名字\n");
+        prompt.push_str("* 如果记忆中有相关信息，请自然地引用，但不要生硬地复述\n");
+        prompt.push_str("* 如果用户问到之前聊过的内容，可以回忆并回答\n");
+        prompt.push_str("* 如果记忆中的信息可能过时，请谨慎使用并适当提醒\n");
+        prompt.push_str("* 保持对话自然流畅，记忆只是辅助，不要让用户感觉到明显的\"检索\"\n");
+
+        prompt.push_str("\n");
+        prompt.push_str("# 非常重要，请务必牢记！！！\n");
+        prompt.push_str("* 接下来的对话回答请用纯文本，绝对不能使用markdown等格式！！！\n");
+        prompt.push_str("* 接下来的对话回答请用纯文本，绝对不能使用markdown等格式！！！\n");
+        prompt.push_str("* 接下来的对话回答请用纯文本，绝对不能使用markdown等格式！！！\n");
         
         prompt
     }

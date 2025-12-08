@@ -5,11 +5,13 @@
 //! - **记忆管理**：短期记忆和长期记忆（RAG）
 //! - **记忆评估**：智能评估对话价值，按需保存
 //! - **向量检索**：基于 PostgreSQL + pgvector 的语义检索
+//! - **MCP 支持**：Model Context Protocol 工具调用
 
 // 核心模块
 mod chat;
 mod config;
 mod llm;
+pub mod mcp;
 mod memory;
 mod memory_evaluation;
 mod prompt_template;
@@ -19,8 +21,13 @@ mod rag_database;
 // 公开导出
 pub use chat::{ChatBot, ChatStats};
 pub use config::{
-    load_config, save_config, Config, DbConfig, EmbeddingConfig, LlmConfig, MemoryConfig,
-    MemoryEvaluationConfig, PostgresConfig, RagConfig,
+    load_config, save_config, Config, DbConfig, EmbeddingConfig, LlmConfig, McpConfig,
+    MemoryConfig, MemoryEvaluationConfig, PostgresConfig, RagConfig,
+};
+pub use llm::{CompletionResponse, FunctionCall, LlmClient, LlmMessage, LlmRequestParams, ToolCall};
+pub use mcp::{
+    McpClient, McpConfigFile, McpContent, McpManager, McpServerConfig, McpTool, McpToolInputSchema,
+    McpToolResult,
 };
 pub use memory_evaluation::{MemoryEvaluator, RetentionDuration};
 pub use rag::TemporalMemory;
@@ -40,4 +47,3 @@ mod tests {
         assert!(!VERSION.is_empty());
     }
 }
-

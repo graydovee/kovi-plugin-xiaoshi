@@ -7,14 +7,80 @@ pub struct Config {
     pub llm: LlmConfig,
     pub db: DbConfig,
     pub memory: MemoryConfig,
+    #[serde(default)]
+    pub mcp: McpConfig,
+}
+
+/// MCP (Model Context Protocol) 配置
+/// 
+/// MCP 配置文件格式示例 (mcp.json):
+/// ```json
+/// {
+///   "mcpServers": {
+///     "filesystem": {
+///       "transport": "stdio",
+///       "command": "npx",
+///       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path"],
+///       "env": {}
+///     },
+///     "sse-server": {
+///       "transport": "sse",
+///       "url": "http://localhost:3000/sse"
+///     },
+///     "http-server": {
+///       "transport": "streamable-http",
+///       "url": "http://localhost:3000/mcp"
+///     }
+///   }
+/// }
+/// ```
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct McpConfig {
+    /// 是否启用 MCP
+    #[serde(default)]
+    pub enabled: bool,
+    /// MCP 配置文件路径（标准 MCP 配置格式）
+    #[serde(default)]
+    pub path: String,
+    /// 最大工具调用循环次数，防止无限循环
+    #[serde(default = "default_max_tool_iterations")]
+    pub max_tool_iterations: usize,
+}
+
+fn default_max_tool_iterations() -> usize {
+    10
+}
+
+impl Default for McpConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            path: String::new(),
+            max_tool_iterations: default_max_tool_iterations(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LlmConfig {
-    pub provider: String,  // "openai" 或 "claude"
     pub model: String,
     pub url: String,
     pub apikey: String,
+    /// 温度参数（0-2），控制输出的随机性，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub temperature: Option<f64>,
+    /// top_p 参数（0-1），控制采样范围，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub top_p: Option<f64>,
+    /// 最大输出 token 数，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub max_tokens: Option<u32>,
+    /// presence_penalty 参数（-2 到 2），设为 None 使用 API 默认值
+    #[serde(default)]
+    pub presence_penalty: Option<f64>,
+    /// frequency_penalty 参数（-2 到 2），设为 None 使用 API 默认值
+    #[serde(default)]
+    pub frequency_penalty: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -92,6 +158,21 @@ pub struct MemoryEvaluationConfig {
     pub apikey: String,            // API Key
     #[serde(default = "default_evaluation_prompt")]
     pub prompt: String,            // 评估提示词
+    /// 温度参数（0-2），控制输出的随机性，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub temperature: Option<f64>,
+    /// top_p 参数（0-1），控制采样范围，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub top_p: Option<f64>,
+    /// 最大输出 token 数，设为 None 使用 API 默认值
+    #[serde(default)]
+    pub max_tokens: Option<u32>,
+    /// presence_penalty 参数（-2 到 2），设为 None 使用 API 默认值
+    #[serde(default)]
+    pub presence_penalty: Option<f64>,
+    /// frequency_penalty 参数（-2 到 2），设为 None 使用 API 默认值
+    #[serde(default)]
+    pub frequency_penalty: Option<f64>,
 }
 
 fn default_evaluation_enabled() -> bool {
@@ -154,10 +235,14 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             llm: LlmConfig {
-                provider: "openai".to_string(),
                 model: String::new(),
                 url: String::new(),
                 apikey: String::new(),
+                temperature: None,
+                top_p: None,
+                max_tokens: None,
+                presence_penalty: None,
+                frequency_penalty: None,
             },
             db: DbConfig {
                 postgres: PostgresConfig {
@@ -190,9 +275,15 @@ impl Default for Config {
                         url: "https://api.siliconflow.cn/v1".to_string(),
                         apikey: String::new(),
                         prompt: default_evaluation_prompt(),
+                        temperature: None,
+                        top_p: None,
+                        max_tokens: None,
+                        presence_penalty: None,
+                        frequency_penalty: None,
                     },
                 },
             },
+            mcp: McpConfig::default(),
         }
     }
 }

@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 kovi = { workspace = true }
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["full", "process", "io-util"] }
 anyhow = "1.0"
 
 # chatbot 子模块依赖
@@ -15,7 +15,7 @@ thiserror = "1.0"
 
 # LLM 集成
 async-openai = "0.23"
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "stream"] }
 
 # 数据库和向量支持
 sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls", "chrono"] }
@@ -27,6 +27,10 @@ ndarray = "0.15"
 
 # 日志
 log = "0.4"
+
+# MCP 支持
+async-trait = "0.1"
+futures-util = "0.3"
 
 # UUID 生成
 uuid = { version = "1.0", features = ["v4"] }
