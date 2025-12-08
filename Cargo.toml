@@ -1,0 +1,32 @@
+[package]
+name = "xiaoshi-kovi-plugin"
+version = "0.2.0"
+edition = "2021"
+
+[dependencies]
+kovi = { workspace = true }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+
+# chatbot 子模块依赖
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+
+# LLM 集成
+async-openai = "0.23"
+reqwest = { version = "0.11", features = ["json"] }
+
+# 数据库和向量支持
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls", "chrono"] }
+pgvector = { version = "0.3", features = ["sqlx"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# 向量计算
+ndarray = "0.15"
+
+# 日志
+log = "0.4"
+
+# UUID 生成
+uuid = { version = "1.0", features = ["v4"] }
